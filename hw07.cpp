@@ -3,7 +3,7 @@
  * Missouri State University, Spring 2019
  *
  * @authors Jim Daehn <jdaehn@missouristate.edu>
- *          TODO: Put your name here
+ *          Dalton McCart <mccart42@live.missouristate.edu>
  * @brief HW 7: Dynamic Programming - Maximum Number of Gold Coins
  *        Due Date: 23:59 Wednesday 15 May 2019
  */
@@ -130,17 +130,74 @@ void display(int **table, const int &rows, const int &cols) {
     // TODO: Display the data in the given array in tabular format.
     // Each value should be printed in a field width of 5. Numbers should be
     // right-aligned in each column
+
+    for (int row{0}; row < rows; row++){
+        for(int col{0}; col < cols; col++){
+            std::cout <<std::setw(5) << table[row][col];
+        }
+        std::cout << std::endl;
+    }
 }
 
 
 int maxNumCoins(int **grid, const int &rows, const int &cols) {
-    // TODO: Compute this value using a dynamic programming approach.
     // Adjust the return value accordingly as this is merely a stub.
-    return 0;
+
+    // create the array needed... a dynamic, two-dimensional array is an int**
+    int **cacheTable;
+    // Create the rows
+    cacheTable = new int *[rows];
+    // Create the columns
+    for (int i{0}; i < rows; ++i) {
+        cacheTable[i] = new int[cols];
+    }
+
+    cacheTable[0][0] = grid[0][0];
+
+
+    //build first row
+    for (int row{1}; row < rows; row++){
+        cacheTable[row][0] = cacheTable[row-1][0] + grid[row][0];
+    }
+    //build first column
+    for (int col{1}; col < cols; col++){
+        cacheTable[0][col] = cacheTable[0][col-1] + grid[0][col];
+    }
+
+    //fill in table
+    for (int row{1}; row < rows; row++) {
+        for (int col{1}; col < cols; col++) {
+            cacheTable[row][col] = grid[row][col] + max(cacheTable[row-1][col], cacheTable[row][col-1]);
+        }
+
+    }
+
+    //bottom right value of the table, which is the greatest value
+    int maxValue = cacheTable[rows-1][cols-1];
+
+
+    //call display to output formatted cacheTable
+    display(cacheTable, rows, cols);
+
+    //clears the cacheTable object by column and row.
+    for (int i{0}; i < rows; i++) {
+        delete[] cacheTable[i];
+        cacheTable[i] = nullptr;
+    }
+
+    delete [] cacheTable;
+    cacheTable = nullptr;
+
+    return maxValue;
 }
 
 int max(const int &a, const int &b) {
-    // TODO: Compute this value. Adjust the return value accordingly as this is
     // merely a stub.
-    return 0;
+
+    if (b > a){
+        return b;
+    }
+    else{
+        return a;
+    }
 }
